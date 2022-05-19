@@ -1,109 +1,211 @@
 import os
-#usuario padrão de incio adm
-#lista
-tUsuarios = list()
-tlivros= list()
-#dicioanrio
-usuarios = {'login':'adm','senha':'adm'}
+
+usuario = []
+acervo = []
 
 
-livros = dict()
-biblioteca = list()
+# LIMPAR TEXTO
+def limpar():
+    print("\n" * 20)
 
-#linha esta definido para o tamanho com 42 caracteres
+
+# classe de cores
+class bcolors:
+    OK = '\033[92m'  # GREEN
+    WARNING = '\033[93m'  # YELLOW
+    FAIL = '\033[91m'  # RED
+    RESET = '\033[0m'  # RESET COLOR
+
+
 def linha(tam=42):
     return '*' * tam
 
-#funcao cabecalho centraliza o cabecalho e chama a funcao linha(hirarquia)
+
+# funcao cabecalho centraliza o cabecalho e chama a funcao linha(hirarquia)
 def cabecalho(txt):
     print(linha())
     print(txt.center(42))
     print(linha())
 
-def menuI(listaInical):
-    cabecalho('Tela inicial')
-    cont = 1
-    for item in listaInical:
-        print(f'{cont}-{item}')
-        cont += 1
 
-def livrosDisponiveis(tlivros):
-    cabecalho('livros disponiveis')
-    print('Descricao ')
-    cont = 1
-    for item in tlivros:
-        print(f'{cont}-{item}')
-        cont += 1
-#funcao menu lista os menus inicais - cadastrar e login
-
-def menu(lista):
-    cabecalho('Reserva de livros')
-    cont = 1
-    for item in lista:
-        print(f'{cont}-{item}')
-        cont +=1
+def cabecalhoMenu():
+    print(linha())
 
 
+# LIVRO
+def listarTodos():
+    for livros in acervo:
+        cabecalho("Todos os livros em nosso acervo")
+        print("Nome:", livros['nome'])
+        print("codigo:", livros['codigo'])
+        print("status:", livros['status'])
+        cabecalhoMenu()
+    op = input("Digite (1) para voltar ")
+    if (op == "1"):
+        menu()
+    else:
+        listarTodos()
 
-#loop enquanto a varivel opcao_incial não  receber 1 ou 2 será redireicionado para a tela de login
-    while True:
-        opcao_tela_incial = input("Sua opção: ")
-        if opcao_tela_incial in '12':
-            break
-        print('\033[33m' + 'Favor digite 1 para realizar o login ou 2 para se cadastrar' + '\033[0;0m')
 
-    if opcao_tela_incial == "1":
-        (cabecalho('Tela Login'))
-        login = input("Digite seu login: ")
-        senha = input("Digite sua senha: ")
-        if(login==usuarios['login']) and (senha == usuarios['senha']):
-            print('\033[32m'+'Seka bem vindo Sr',login+'\033[0;0m')
-            menuI(['Pesquisar', 'Cadastrar Livro','Sair do sistema'])
-            while True:
-                opcao_menu_incial = input("Sua opção: ")
-                if opcao_menu_incial in '123':
-                    break
-                print('\033[33m' + 'Favor digite 1 para realizar a pesquisa, 2 para cadastrar um livro ou 3 para Sair do sistema' + '\033[0;0m')
-            if(opcao_menu_incial=="1"):
-                print("deu certp")
-                for e in biblioteca:
-                    for v in e.values():
-                        print(v, end=' ')
-                    print()
+def cadastrarlivro():
+    codigo = input("codigo: ")
+    nome = input("Nome: ")
+    status = "Disponivel"
 
-            elif(opcao_menu_incial=="2"):
-                for c in range(0, 2):
-                    livros['codigo'] = str(input('Digite o codigo do livro :'))
-                    livros['descricao'] = str(input('Digite a descricao do livro :'))
-                    livros['status'] = str(input('Digite o status do livro :'))
-                    biblioteca.append(livros.copy())
-                menuI(['Pesquisar', 'Cadastrar Livro', 'Sair do sistema'])
-                while True:
-                    opcao_menu_incial = input("Sua opção: ")
-                    if opcao_menu_incial in '123':
-                        break
-                    print('\033[33m' + 'Favor digite 1 para realizar a pesquisa, 2 para cadastrar um livro ou 3 para Sair do sistema' + '\033[0;0')
+    livros = {'nome': nome, 'codigo': codigo, 'status': status}
+    acervo.append(livros)
 
+
+def consultarLivro(valor):
+    for livros in acervo:
+        if valor == livros['codigo']:
+            cabecalho("Resultado da busca")
+            print("Nome:", livros['nome'])
+            print("codigo:", livros['codigo'])
+            print("status:", livros['status'])
+            cabecalhoMenu()
         else:
-            print('\033[31m'+'Dados incorretos'+'\033[0;0m')
-            menu(lista)
-
-    #tela de cadastro se a variavel opcao inical receber 2 será direceionado para tela de cadastro
-    elif(opcao_tela_incial=="2"):
-        (cabecalho('Tela Cadastro Usuario'))
-        new_user = input("Digite o seu login: ")
-        new_password = input("Digite a sua senha: ")
-        usuarios['login'] = new_user
-        usuarios['senha'] = new_password
-        # a lista vai listando os usuarios cadastrados no dicionario
-        tUsuarios.append(usuarios.copy())
-        print(tUsuarios)
-
-        print('\033[32m'+'Usuario cadastrado'+'\033[0;0m')
-        menu(lista)
-    # tela inical se a variavel opcao inical receber um valor diferente de 1 ou 2 será redireceionado para tela de login
+            print("Não temos esse livro em nosso acervo")
 
 
-menu(['Login','cadastra-se'])
+def editarLivro(valor):
+    for livros in acervo:
+        if valor == livros['codigo']:
+            op = input("Digite (1) para reservar o livro: ")
+            if (op == "1"):
+                livros['status'] = "Reservado"
+                print("Nome:", livros['nome'])
+                print("codigo:", livros['codigo'])
+                print("status:", livros['status'])
+                cabecalhoMenu()
+                print(bcolors.OK + "Alteração realizado com sucesso" + bcolors.RESET)
+            else:
+                print(bcolors.OK + "Operação cancelada" + bcolors.RESET)
+        else:
+            print(bcolors.WARNING + "Não temos esse livro em nosso acervo" + bcolors.RESET2)
+
+    # LOGIN
+
+
+def cadastrarUsuario():
+    login = input("Digite o seu login: ")
+    senha = input("Digite a sua senha: ")
+    dadosUsuario = {'login': login, 'senha': senha}
+    usuario.append(dadosUsuario)
+    print(bcolors.OK + "Usuário cadastrado com sucesso! " + bcolors.RESET)
+
+
+def validacaoLogin(usuarioLogin, usuarioSenha):
+    for dadosUsuario in usuario:
+        if usuarioLogin == dadosUsuario['login'] and usuarioSenha == dadosUsuario['senha']:
+            limpar()
+            print(bcolors.OK + "Bem vindo: ", usuarioLogin + bcolors.RESET)
+            menu()
+        else:
+            print(bcolors.WARNING + "Usuário ainda não cadastrado" + bcolors.RESET)
+
+
+def menu():
+    op = 0
+    while op != "8":
+        op = input(bcolors.OK + ">>>Menu incial<<<" + bcolors.RESET + '''
+
+1- Cadastrar um Livro
+2- Consultar um Livro
+3- Listar todos os Livros
+4- alterar um livro
+5- Login
+6- Cadastrar
+7- Logout
+
+Escolha uma opção: ''')
+
+        if (op == "1"):
+            cadastrarlivro()
+            # Enquanto a variavel receber 1 será feito um loop onde Será perguntado ao usuario se ele irá cadastrar outro livro
+            opcaoCadastar = input("Desejar cadastrar outro livro (1) Sim (0) Voltar: ")
+            while opcaoCadastar == "1":
+                cadastrarlivro()
+                opcaoCadastar = input("Desejar cadastrar outro livro (1) Sim (0) Voltar: ")
+
+        elif (op == "2"):
+            consultar = input('Digite o código do livro: ')
+            if len(acervo) > 0:
+                consultarLivro(consultar)
+                # Enquanto a variavel receber 1 será feito um loop onde Será perguntado ao usuario se ele irá realozar a consulta novamente
+                opcaoConsultaUnitario = input("Dessaja realizar outra busca (1) Sim (0) Não: ")
+                while opcaoConsultaUnitario == "1":
+                    if len(acervo) > 0:
+                        consultar = input('Digite o código do livro: ')
+                        consultarLivro(consultar)
+                        opcaoConsultaUnitario = input("Dessaja realizar outra busca (1) Sim (0) Não: ")
+                    else:
+                        print(bcolors.FAIL + "Nosso acervo está vazio" + bcolors.RESET)
+                        menu()
+                else:
+                    menu()
+
+            else:
+                print(bcolors.FAIL + "Nosso acervo está vazio" + bcolors.RESET)
+                menu()
+
+
+
+        elif (op == "3"):
+            if len(acervo) > 0:
+                listarTodos()
+            else:
+                print(bcolors.FAIL + "Nosso acervo está vazio" + bcolors.RESET)
+
+        elif (op == "4"):
+            if len(acervo) > 0:
+                consultar = input('Digite o código do livro que deseja alterar: ')
+                editarLivro(consultar)
+
+            else:
+                print(bcolors.FAIL + "Nosso acervo está vazio" + bcolors.RESET)
+
+
+        elif (op == "5"):
+            loginUsuario = input("Digite o seu login: ")
+            validacaoLogin(loginUsuario)
+
+        elif (op == "6"):
+            cadastrarUsuario()
+        elif (op == "7"):
+            login()
+        else:
+            print("Opção invalida")
+
+
+def login():
+    # Tela login e cadastrado
+    op = 0
+    while op != "3":
+        op = input(bcolors.OK + ">>>Tela lOGIN<<<" + bcolors.RESET + '''
+
+        1- Login
+        2- Cadastrar
+        2- Sair do sistema
+
+
+        Escolha uma opção: ''')
+
+        # LOGIN
+        if (op == "1"):
+            loginUsuario = input("Digite o seu login: ")
+            senhaUsuario = input("Digite a sua Senha: ")
+            if len(usuario) > 0:
+                validacaoLogin(loginUsuario, senhaUsuario)
+
+            else:
+                cabecalho(bcolors.WARNING + "Sistema ainda não possui nenhum Usuário cadastrado" + bcolors.RESET)
+        # CADASTRAR
+        elif (op == "2"):
+            cadastrarUsuario()
+
+
+login()
+
 
 
