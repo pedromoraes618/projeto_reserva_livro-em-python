@@ -35,7 +35,6 @@ def cabecalhoMenu():
 # LIVRO
 def listarTodos():
     for livros in acervo:
-        cabecalho("Todos os livros em nosso acervo || All books in our collection")
         print("Nome:", livros['nome'])
         print("codigo:", livros['codigo'])
         print("status:", livros['status'])
@@ -44,18 +43,34 @@ def listarTodos():
     if (op == "1"):
         menu()
     else:
+        print("Opção invalida || Invalid option")
         listarTodos()
 
+# LIVRO
+def listarTodosReservados(reservado):
+    for livros in acervo:
+        if (reservado == livros['status']):
+            print("Nome:", livros['nome'])
+            print("codigo:", livros['codigo'])
+            print("status:", livros['status'])
+            cabecalhoMenu()
 
+    op = input("Digite (1) para voltar || Type (1) to go back: ")
+    if (op == "1"):
+        menu()
+    else:
+        print("Opção invalida || Invalid option")
+        listarTodos()
+
+##funcao para cadastrar o livro
 def cadastrarlivro():
     codigo = input("Código: ")
     nome = input("Nome: ")
     status = "Disponivel"
-
     livros = {'nome': nome, 'codigo': codigo, 'status': status}
     acervo.append(livros)
 
-
+##funcao para consultar um livro
 def consultarLivro(valor):
     for livros in acervo:
         if valor == livros['codigo']:
@@ -66,7 +81,7 @@ def consultarLivro(valor):
             cabecalhoMenu()
 
 
-
+#funcao para reservar um livro
 def reservarLivro(valor):
     for livros in acervo:
         if valor == livros['codigo']:
@@ -88,30 +103,33 @@ def reservarLivro(valor):
         #     print(bcolors.WARNING + "Não temos esse livro em nosso acervo" + bcolors.RESET)
         #     menu()
 
+#funcao para excluir o livro, o que está entre parenteses é o codigo do livro que o ususario digitou
 def excluirLivro(valor):
     cont = -1
     for livros in acervo:
         cont = cont+1
         if livros['codigo'] == valor:
-            del acervo[cont]
-            print(bcolors.OK + "Livro deletado com sucesso || Successfully deleted book" + bcolors.RESET)
+            if livros['status'] == "Reservado":
+                print(bcolors.FAIL + "Não é possivel excluir esse livro pois ele está reservado || Cannot delete this book as it is reserved" + bcolors.RESET )
+            else:
+                del acervo[cont]
+                print(bcolors.OK + "Livro deletado com sucesso || Successfully deleted book" + bcolors.RESET)
 
 
 
-
-def cadastrarUsuario():
-    login = input("Digite o seu login || Enter your login: ")
-    senha = input("Digite a sua senha || Enter your password: ")
+##funcao para cadastrar um ususario
+def cadastrarUsuario(login,senha):
     dadosUsuario = {'login': login, 'senha': senha}
     usuario.append(dadosUsuario)
     print(bcolors.OK + "Usuário cadastrado com sucesso || User registered successfully! " + bcolors.RESET)
 
 
+## validar o login || verifica se o usuario tem cadastro no sistema
 def validacaoLogin(usuarioLogin, usuarioSenha):
     for dadosUsuario in usuario:
         if usuarioLogin == dadosUsuario['login'] and usuarioSenha == dadosUsuario['senha']:
             limpar()
-            print(bcolors.OK + "Bem vindo || Welcome: ", usuarioLogin + bcolors.RESET)
+            print(bcolors.OK + "Bem vindo || Welcome ", usuarioLogin + bcolors.RESET)
             menu()
         else:
             print(bcolors.WARNING + "Usuário ainda não cadastrado" + bcolors.RESET)
@@ -127,7 +145,7 @@ def menu():
 3- Listar todos os Livros || List all books
 4- Reservar um Livro || Resever a book
 5- Excluir Livro || Delete Book
-6- Cadastrar Usuário || Register user
+6- Listar todos os livros Reservados|| Register user
 7- Logout
 
 Escolha uma opção || Choose an option: ''')
@@ -164,9 +182,9 @@ Escolha uma opção || Choose an option: ''')
                 menu()
 
 
-
         elif (op == "3"):
             if len(acervo) > 0:
+                cabecalho("Todos os livros em nosso acervo || All books in our collection")
                 listarTodos()
             else:
                 print(bcolors.FAIL + "Nosso acervo está vazio || Our collection is empty" + bcolors.RESET)
@@ -183,21 +201,28 @@ Escolha uma opção || Choose an option: ''')
 
         elif (op == "5"):
             excluir = input("Digite o código do livro a ser excluido || Enter the book code to be unique: ")
-
             excluirLivro(excluir)
 
         elif (op == "6"):
-            cadastrarUsuario()
+            cabecalho("Todos os livros reservados")
+            if len(acervo) > 0:
+                reservado = "Reservado"
+                listarTodosReservados(reservado)
+            else:
+                print(bcolors.FAIL + "Nosso acervo está vazio || Our collection is empty" + bcolors.RESET)
+
         elif (op == "7"):
-            login()
+           login()
         else:
             print("Opção invalida")
 
 
 def login():
     # Tela login e cadastrado
+
     op = 0
     while op != "3":
+
         op = input(bcolors.OK + ">>>Tela lOGIN || Login Screen<<<" + bcolors.RESET + '''
 
         1- Login
@@ -219,7 +244,11 @@ def login():
                                             "System does not have any registered User yet." + bcolors.RESET)
         # CADASTRAR
         elif (op == "2"):
-            cadastrarUsuario()
+            print(bcolors.OK + ">>>Tela de cadastro de Usuário || Login Screen<<<" + bcolors.RESET)
+            login = input("Digite o seu login || Enter your login: ")
+            senha = input("Digite a sua senha || Enter your password: ")
+            cadastrarUsuario(login,senha)
+
     else:
          print("Sair do sistema || Exit system")
 
